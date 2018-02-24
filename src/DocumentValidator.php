@@ -69,27 +69,17 @@ class DocumentValidator
      */
     private function isValidNIF($docNumber)
     {
-        $isValid = false;
-        $fixedDocNumber = "";
-        $correctDigit = "";
-        $writtenDigit = "";
-
-        if (!preg_match("/^[A-Z]+$/i", substr($fixedDocNumber, 1, 1))) {
-            $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-        } else {
-            $fixedDocNumber = strtoupper($docNumber);
-        }
-
+        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
         $writtenDigit = strtoupper(substr($docNumber, -1, 1));
 
         if ($this->isValidNIFFormat($fixedDocNumber)) {
             $correctDigit = $this->getNIFCheckDigit($fixedDocNumber);
             if ($writtenDigit == $correctDigit) {
-                $isValid = true;
+                return true;
             }
         }
 
-        return $isValid;
+        return false;
     }
 
     /*
