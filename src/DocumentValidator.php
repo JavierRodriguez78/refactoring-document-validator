@@ -25,6 +25,8 @@ class DocumentValidator
     *   Returns:
     *       TRUE
     */
+    const NIF_REGEX = '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/';
+
     public function isValidIdNumber($docNumber, $type)
     {
         $fixedDocNumber = strtoupper($docNumber);
@@ -209,7 +211,7 @@ class DocumentValidator
 
     private function isValidNIFFormat($docNumber)
     {
-        return $this->respectsDocPattern($docNumber, '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/');
+        return $this->respectsDocPattern($docNumber, self::NIF_REGEX);
     }
     /*
      *   This function validates the format of a given string in order to
