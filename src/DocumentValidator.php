@@ -2,6 +2,8 @@
 
 namespace DocumentValidator;
 
+use function str_split;
+
 class DocumentValidator
 {
     /*
@@ -337,40 +339,45 @@ class DocumentValidator
 
     private function getCIFCheckDigit($docNumber)
     {
-        $fixedDocNumber = "";
-        $centralChars = "";
-        $firstChar = "";
-        $evenSum = 0;
-        $oddSum = 0;
-        $totalSum = 0;
-        $lastDigitTotalSum = 0;
-        $correctDigit = "";
         $fixedDocNumber = strtoupper($docNumber);
+        $totalSum = $this->getCifDigitsSum($fixedDocNumber);
+        $lastDigitTotalSum = substr($totalSum, -1);
 
-        if ($this->isValidCIFFormat($fixedDocNumber)) {
-            $firstChar = substr($fixedDocNumber, 0, 1);
-            $centralChars = substr($fixedDocNumber, 1, 7);
-            $evenSum = substr($centralChars, 1, 1) + substr($centralChars, 3, 1) + substr($centralChars, 5, 1);
-            $oddSum = $this->sumDigits(substr($centralChars, 0, 1) * 2) + $this->sumDigits(substr($centralChars, 2,
-                        1) * 2) + $this->sumDigits(substr($centralChars, 4,
-                        1) * 2) + $this->sumDigits(substr($centralChars, 6, 1) * 2);
-            $totalSum = $evenSum + $oddSum;
-            $lastDigitTotalSum = substr($totalSum, -1);
-
-            if ($lastDigitTotalSum > 0) {
-                $correctDigit = 10 - ($lastDigitTotalSum % 10);
-            } else {
-                $correctDigit = 0;
-            }
+        if ($lastDigitTotalSum > 0) {
+            $correctDigit = 10 - ($lastDigitTotalSum % 10);
+        } else {
+            $correctDigit = 0;
         }
+
         /* If CIF number starts with P, Q, S, N, W or R,
             check digit sould be a letter */
-        if (preg_match('/[PQSNWR]/', $firstChar)) {
+        if (preg_match('/^[PQSNWR].*/', $fixedDocNumber)) {
             $correctDigit = substr("JABCDEFGHI", $correctDigit, 1);
         }
 
         return $correctDigit;
     }
+
+    private function getCifDigitsSum($fixedDocNumber)
+    {
+        $digits = substr($fixedDocNumber, 1, 7);
+        $digitsArray = str_split($digits);
+
+        $oddSum = 0;
+        $evenSum = 0;
+        for ($i = 0; $i < count($digitsArray); $i++) {
+            if ($i % 2 == 0) {
+                $oddSum += array_sum(str_split($digitsArray[$i] * 2));
+            } else {
+                $evenSum += $digitsArray[$i];
+            }
+        }
+
+        $totalSum = $evenSum + $oddSum;
+
+        return $totalSum;
+    }
+
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits a regexp pattern.
@@ -395,7 +402,6 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-
     private function respectsDocPattern($givenString, $pattern)
     {
         $isValid = false;
@@ -411,6 +417,7 @@ class DocumentValidator
 
         return $isValid;
     }
+
     /*
      *   This function performs the sum, one by one, of the digits
      *   in a given quantity.
