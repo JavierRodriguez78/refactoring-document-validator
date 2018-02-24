@@ -20,6 +20,10 @@ class DocumentValidatorTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * Generate with: http://ensaimeitor.apsl.net/fiscal/10/
+     * @return array
+     */
     public function getValidNif()
     {
         return [
@@ -50,14 +54,31 @@ class DocumentValidatorTest extends TestCase
 
     /**
      * @test
+     * @dataProvider getValidNie
      */
-    public function itShouldValidateAValidNie()
+    public function itShouldValidateAValidNie($nie)
     {
         $validator = new DocumentValidator();
 
-        $result = $validator->isValidIdNumber('X6089822C', 'nie');
+        $result = $validator->isValidIdNumber($nie, 'nie');
 
         $this->assertTrue($result);
+    }
+
+    public function getValidNie()
+    {
+        return [
+            ['Z2757153X'],
+            ['Y4146427R'],
+            ['Z6998997X'],
+            ['Y2866432W'],
+            ['X2536926A'],
+            ['X2536926A'],
+            ['X8440061G'],
+            ['Y4985449Y'],
+            ['X1402535H'],
+            ['X0673874C'],
+        ];
     }
 
     /**
@@ -85,6 +106,10 @@ class DocumentValidatorTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * Generated with http://ensaimeitor.apsl.net/cif/10/
+     * @return array
+     */
     public function getValidCif()
     {
         return [
@@ -97,6 +122,7 @@ class DocumentValidatorTest extends TestCase
             ['B68466820'],
             ['A58313859'],
             ['S5750409D'],
+            ['P8343433B'],
         ];
     }
 
