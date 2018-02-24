@@ -8,11 +8,11 @@ class NifValidator extends Validator
 
     public function isValid($number)
     {
-        $fixedDocNumber = strtoupper(substr("000000000" . $number, -9));
+        $number = $this->normalizeDocumentNumber($number);
         $writtenDigit = strtoupper(substr($number, -1, 1));
 
-        if ($this->isValidNIFFormat($fixedDocNumber)) {
-            $correctDigit = $this->getNIFCheckDigit($fixedDocNumber);
+        if ($this->isValidNIFFormat($number)) {
+            $correctDigit = $this->getNIFCheckDigit($number);
             if ($writtenDigit == $correctDigit) {
                 return true;
             }
@@ -21,23 +21,21 @@ class NifValidator extends Validator
         return false;
     }
 
-    private function isValidNIFFormat($docNumber)
+    private function isValidNIFFormat($number)
     {
-        return $this->respectsDocPattern($docNumber, self::NIF_REGEX);
+        return $this->respectsDocPattern($number, self::NIF_REGEX);
     }
 
-    private function getNIFCheckDigit($docNumber)
+    private function getNIFCheckDigit($number)
     {
         $keyString = 'TRWAGMYFPDXBNJZSQVHLCKE';
         $correctLetter = "";
 
-        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-
-        if ($this->isValidNIFFormat($fixedDocNumber)) {
-            $fixedDocNumber = str_replace('K', '0', $fixedDocNumber);
-            $fixedDocNumber = str_replace('L', '0', $fixedDocNumber);
-            $fixedDocNumber = str_replace('M', '0', $fixedDocNumber);
-            $position = substr($fixedDocNumber, 0, 8) % 23;
+        if ($this->isValidNIFFormat($number)) {
+            $number = str_replace('K', '0', $number);
+            $number = str_replace('L', '0', $number);
+            $number = str_replace('M', '0', $number);
+            $position = substr($number, 0, 8) % 23;
             $correctLetter = substr($keyString, $position, 1);
         }
 

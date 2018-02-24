@@ -21,4 +21,11 @@ abstract class Validator
 
         return $isValid;
     }
+
+    protected function normalizeDocumentNumber($number)
+    {
+        $normalized = strtoupper(substr("000000000" . $number, -9));
+
+        return $normalized;
+    }
 }

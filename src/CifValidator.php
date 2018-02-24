@@ -8,11 +8,11 @@ class CifValidator extends Validator
 
     public function isValid($number)
     {
-        $fixedDocNumber = strtoupper($number);
-        $writtenDigit = substr($fixedDocNumber, -1, 1);
+        $number = $this->normalizeDocumentNumber($number);
+        $writtenDigit = substr($number, -1, 1);
 
-        if ($this->isValidCIFFormat($fixedDocNumber) == 1) {
-            $correctDigit = $this->getCIFCheckDigit($fixedDocNumber);
+        if ($this->isValidCIFFormat($number) == 1) {
+            $correctDigit = $this->getCIFCheckDigit($number);
 
             if ($writtenDigit == $correctDigit) {
                 return true;
@@ -22,15 +22,14 @@ class CifValidator extends Validator
         return false;
     }
 
-    private function isValidCIFFormat($docNumber)
+    private function isValidCIFFormat($number)
     {
-        return $this->respectsDocPattern($docNumber, self::CIF_REGEX);
+        return $this->respectsDocPattern($number, self::CIF_REGEX);
     }
 
-    private function getCIFCheckDigit($docNumber)
+    private function getCIFCheckDigit($number)
     {
-        $fixedDocNumber = strtoupper($docNumber);
-        $totalSum = $this->getCifDigitsSum($fixedDocNumber);
+        $totalSum = $this->getCifDigitsSum($number);
         $lastDigitTotalSum = substr($totalSum, -1);
 
         if ($lastDigitTotalSum > 0) {
@@ -39,18 +38,20 @@ class CifValidator extends Validator
             $correctDigit = 0;
         }
 
-        /* If CIF number starts with P, Q, S, N, W or R,
-            check digit sould be a letter */
-        if (preg_match('/^[PQSNWR].*/', $fixedDocNumber)) {
+        /**
+         * If CIF number starts with P, Q, S, N, W or R,
+         * check digit sould be a letter
+         */
+        if (preg_match('/^[PQSNWR].*/', $number)) {
             $correctDigit = substr("JABCDEFGHI", $correctDigit, 1);
         }
 
         return $correctDigit;
     }
 
-    private function getCifDigitsSum($fixedDocNumber)
+    private function getCifDigitsSum($number)
     {
-        $digits = substr($fixedDocNumber, 1, 7);
+        $digits = substr($number, 1, 7);
         $digitsArray = str_split($digits);
 
         $oddSum = 0;
