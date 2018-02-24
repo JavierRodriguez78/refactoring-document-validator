@@ -417,33 +417,4 @@ class DocumentValidator
 
         return $isValid;
     }
-
-    /*
-     *   This function performs the sum, one by one, of the digits
-     *   in a given quantity.
-     *
-     *   For instance, it returns 6 for 123 (as it sums 1 + 2 + 3).
-     *
-     *   This function is used by:
-     *       - getCIFCheckDigit
-     *
-     *   Usage:
-     *       echo sumDigits( 12345 );
-     *   Returns:
-     *       15
-     */
-
-    private function sumDigits($digits)
-    {
-        $total = 0;
-        $i = 1;
-
-        while ($i <= strlen($digits)) {
-            $thisNumber = substr($digits, $i - 1, 1);
-            $total += $thisNumber;
-            $i++;
-        }
-
-        return $total;
-    }
 }
