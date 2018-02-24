@@ -27,8 +27,6 @@ class DocumentValidator
     *   Returns:
     *       TRUE
     */
-    const NIE_REGEX = '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/';
-
     const CIF_REGEX = '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]|^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/';
 
     public function isValidIdNumber($docNumber, $type)
@@ -41,7 +39,8 @@ class DocumentValidator
                 $validator = new NifValidator();
                 return $validator->isValid($fixedDocNumber);
             case 'NIE':
-                return $this->isValidNIE($fixedDocNumber);
+                $validator = new NieValidator();
+                return $validator->isValid($fixedDocNumber);
             case 'CIF':
                 return $this->isValidCIF($fixedDocNumber);
             default:
@@ -49,70 +48,6 @@ class DocumentValidator
         }
     }
 
-    /*
-     *   This function validates a Spanish identification number
-     *   verifying its check digits.
-     *
-     *   This function is intended to work with NIE numbers.
-     *
-     *   This function is used by:
-     *       - isValidIdNumber
-     *
-     *   This function requires:
-     *       - isValidNIEFormat
-     *       - isValidNIF
-     *
-     *   This function returns:
-     *       TRUE: If specified identification number is correct
-     *       FALSE: Otherwise
-     *
-     *   Algorithm works as described in:
-     *       http://www.interior.gob.es/dni-8/calculo-del-digito-de-control-del-nif-nie-2217
-     *
-     *   Usage:
-     *       echo isValidNIE( 'X6089822C' )
-     *   Returns:
-     *       TRUE
-     */
-    private function isValidNIE($docNumber)
-    {
-        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-
-        if ($this->isValidNIEFormat($fixedDocNumber)) {
-
-            if (substr($fixedDocNumber, 1, 1) == "T") {
-                return true;
-            }
-            /* The algorithm for validating the check digits of a NIE number is
-                identical to the altorithm for validating NIF numbers. We only have to
-                replace Y, X and Z with 1, 0 and 2 respectively; and then, run
-                the NIF altorithm */
-            $fixedDocNumber = $this->prepareToNifValidation($fixedDocNumber);
-
-            $nifValidator = new NifValidator();
-            
-            return $nifValidator->isValid($fixedDocNumber);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $fixedDocNumber
-     * @return string
-     */
-    private function prepareToNifValidation($fixedDocNumber)
-    {
-        $numberWithoutLast = substr($fixedDocNumber, 0, strlen($fixedDocNumber) - 1);
-        $lastDigit = substr($fixedDocNumber, strlen($fixedDocNumber) - 1, strlen($fixedDocNumber));
-        $numberWithoutLast = str_replace('Y', '1', $numberWithoutLast);
-        $numberWithoutLast = str_replace('X', '0', $numberWithoutLast);
-        $numberWithoutLast = str_replace('Z', '2', $numberWithoutLast);
-        $fixedDocNumber = $numberWithoutLast . $lastDigit;
-
-        return $fixedDocNumber;
-    }
-    
     /*
      *   This function validates a Spanish identification number
      *   verifying its check digits.
@@ -155,34 +90,6 @@ class DocumentValidator
         return false;
     }
 
-    /*
-     *   This function validates the format of a given string in order to
-     *   see if it fits with NIE format. Practically, it performs a validation
-     *   over a NIE, except this function does not check the check digit.
-     *
-     *   This function is intended to work with NIE numbers.
-     *
-     *   This function is used by:
-     *       - isValidIdNumber
-     *       - isValidNIE
-     *
-     *   This function requires:
-     *       - respectsDocPattern
-     *
-     *   This function returns:
-     *       TRUE: If specified string respects NIE format
-     *       FALSE: Otherwise
-     *
-     *   Usage:
-     *       echo isValidNIEFormat( 'X6089822C' )
-     *   Returns:
-     *       TRUE
-     */
-
-    private function isValidNIEFormat($docNumber)
-    {
-        return $this->respectsDocPattern($docNumber, self::NIE_REGEX);
-    }
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with CIF format. Practically, it performs a validation
