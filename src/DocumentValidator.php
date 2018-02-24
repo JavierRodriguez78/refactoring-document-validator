@@ -25,21 +25,23 @@ class DocumentValidator
     *   Returns:
     *       TRUE
     */
-    public function isValidIdNumber( $docNumber, $type ) {
-        $fixedDocNumber = strtoupper( $docNumber );
-        $fixedType = strtoupper( $type );
+    public function isValidIdNumber($docNumber, $type)
+    {
+        $fixedDocNumber = strtoupper($docNumber);
+        $fixedType = strtoupper($type);
 
         switch ($fixedType) {
             case 'NIF':
-                return $this->isValidNIF( $fixedDocNumber );
+                return $this->isValidNIF($fixedDocNumber);
             case 'NIE':
-                return $this->isValidNIE( $fixedDocNumber );
+                return $this->isValidNIE($fixedDocNumber);
             case 'CIF':
-                return $this->isValidCIF( $fixedDocNumber );
+                return $this->isValidCIF($fixedDocNumber);
             default:
                 throw new \Exception('Unsupported Type');
         }
     }
+
     /*
      *   This function validates a Spanish identification number
      *   verifying its check digits.
@@ -65,25 +67,31 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function isValidNIF( $docNumber ) {
-        $isValid = FALSE;
+    private function isValidNIF($docNumber)
+    {
+        $isValid = false;
         $fixedDocNumber = "";
         $correctDigit = "";
         $writtenDigit = "";
-        if( !preg_match( "/^[A-Z]+$/i", substr( $fixedDocNumber, 1, 1 ) ) ) {
-            $fixedDocNumber = strtoupper( substr( "000000000" . $docNumber, -9 ) );
+
+        if (!preg_match("/^[A-Z]+$/i", substr($fixedDocNumber, 1, 1))) {
+            $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
         } else {
-            $fixedDocNumber = strtoupper( $docNumber );
+            $fixedDocNumber = strtoupper($docNumber);
         }
-        $writtenDigit = strtoupper(substr( $docNumber, -1, 1 ));
-        if( $this->isValidNIFFormat( $fixedDocNumber ) ) {
-            $correctDigit = $this->getNIFCheckDigit( $fixedDocNumber );
-            if( $writtenDigit == $correctDigit ) {
-                $isValid = TRUE;
+
+        $writtenDigit = strtoupper(substr($docNumber, -1, 1));
+
+        if ($this->isValidNIFFormat($fixedDocNumber)) {
+            $correctDigit = $this->getNIFCheckDigit($fixedDocNumber);
+            if ($writtenDigit == $correctDigit) {
+                $isValid = true;
             }
         }
+
         return $isValid;
     }
+
     /*
      *   This function validates a Spanish identification number
      *   verifying its check digits.
@@ -109,33 +117,39 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function isValidNIE( $docNumber ) {
-        $isValid = FALSE;
+    private function isValidNIE($docNumber)
+    {
+        $isValid = false;
         $fixedDocNumber = "";
-        if( !preg_match( "/^[A-Z]+$/i", substr( $fixedDocNumber, 1, 1 ) ) ) {
-            $fixedDocNumber = strtoupper( substr( "000000000" . $docNumber, -9 ) );
+
+        if (!preg_match("/^[A-Z]+$/i", substr($fixedDocNumber, 1, 1))) {
+            $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
         } else {
-            $fixedDocNumber = strtoupper( $docNumber );
+            $fixedDocNumber = strtoupper($docNumber);
         }
-        if( $this->isValidNIEFormat( $fixedDocNumber ) ) {
-            if( substr( $fixedDocNumber, 1, 1 ) == "T" ) {
-                $isValid = TRUE;
+
+        if ($this->isValidNIEFormat($fixedDocNumber)) {
+
+            if (substr($fixedDocNumber, 1, 1) == "T") {
+                $isValid = true;
             } else {
                 /* The algorithm for validating the check digits of a NIE number is
                     identical to the altorithm for validating NIF numbers. We only have to
                     replace Y, X and Z with 1, 0 and 2 respectively; and then, run
                     the NIF altorithm */
-                $numberWithoutLast = substr( $fixedDocNumber, 0, strlen($fixedDocNumber)-1 );
-                $lastDigit = substr( $fixedDocNumber, strlen($fixedDocNumber)-1, strlen($fixedDocNumber) );
+                $numberWithoutLast = substr($fixedDocNumber, 0, strlen($fixedDocNumber) - 1);
+                $lastDigit = substr($fixedDocNumber, strlen($fixedDocNumber) - 1, strlen($fixedDocNumber));
                 $numberWithoutLast = str_replace('Y', '1', $numberWithoutLast);
                 $numberWithoutLast = str_replace('X', '0', $numberWithoutLast);
                 $numberWithoutLast = str_replace('Z', '2', $numberWithoutLast);
                 $fixedDocNumber = $numberWithoutLast . $lastDigit;
-                $isValid = $this->isValidNIF( $fixedDocNumber );
+                $isValid = $this->isValidNIF($fixedDocNumber);
             }
         }
+
         return $isValid;
     }
+
     /*
      *   This function validates a Spanish identification number
      *   verifying its check digits.
@@ -161,21 +175,26 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function isValidCIF( $docNumber ) {
-        $isValid = FALSE;
+    private function isValidCIF($docNumber)
+    {
+        $isValid = false;
         $fixedDocNumber = "";
         $correctDigit = "";
         $writtenDigit = "";
-        $fixedDocNumber = strtoupper( $docNumber );
-        $writtenDigit = substr( $fixedDocNumber, -1, 1 );
-        if( $this->isValidCIFFormat( $fixedDocNumber ) == 1 ) {
-            $correctDigit = $this->getCIFCheckDigit( $fixedDocNumber );
-            if( $writtenDigit == $correctDigit ) {
-                $isValid = TRUE;
+        $fixedDocNumber = strtoupper($docNumber);
+        $writtenDigit = substr($fixedDocNumber, -1, 1);
+
+        if ($this->isValidCIFFormat($fixedDocNumber) == 1) {
+            $correctDigit = $this->getCIFCheckDigit($fixedDocNumber);
+
+            if ($writtenDigit == $correctDigit) {
+                $isValid = true;
             }
         }
+
         return $isValid;
     }
+
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with NIF format. Practically, it performs a validation
@@ -196,11 +215,11 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function isValidNIFFormat( $docNumber ) {
-        return $this->respectsDocPattern(
-            $docNumber,
-            '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/' );
+    private function isValidNIFFormat($docNumber)
+    {
+        return $this->respectsDocPattern($docNumber, '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/');
     }
+
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with NIE format. Practically, it performs a validation
@@ -224,11 +243,11 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function isValidNIEFormat( $docNumber ) {
-        return $this->respectsDocPattern(
-            $docNumber,
-            '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/' );
+    private function isValidNIEFormat($docNumber)
+    {
+        return $this->respectsDocPattern($docNumber, '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/');
     }
+
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with CIF format. Practically, it performs a validation
@@ -252,16 +271,13 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function isValidCIFFormat( $docNumber ) {
-        return
-            $this->respectsDocPattern(
-                $docNumber,
-                '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/' )
-            or
-            $this->respectsDocPattern(
-                $docNumber,
-                '/^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/' );
+    private function isValidCIFFormat($docNumber)
+    {
+        return $this->respectsDocPattern($docNumber,
+                '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/') or $this->respectsDocPattern($docNumber,
+                '/^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/');
     }
+
     /*
      *   This function calculates the check digit for an individual Spanish
      *   identification number (NIF).
@@ -283,29 +299,35 @@ class DocumentValidator
      *   Returns:
      *       Q
      */
-    private function getNIFCheckDigit( $docNumber ) {
+    private function getNIFCheckDigit($docNumber)
+    {
         $keyString = 'TRWAGMYFPDXBNJZSQVHLCKE';
         $fixedDocNumber = "";
         $position = 0;
         $writtenLetter = "";
         $correctLetter = "";
-        if( !preg_match( "/^[A-Z]+$/i", substr( $fixedDocNumber, 1, 1 ) ) ) {
-            $fixedDocNumber = strtoupper( substr( "000000000" . $docNumber, -9 ) );
+
+        if (!preg_match("/^[A-Z]+$/i", substr($fixedDocNumber, 1, 1))) {
+            $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
         } else {
-            $fixedDocNumber = strtoupper( $docNumber );
+            $fixedDocNumber = strtoupper($docNumber);
         }
-        if( $this->isValidNIFFormat( $fixedDocNumber ) ) {
-            $writtenLetter = substr( $fixedDocNumber, -1 );
-            if( $this->isValidNIFFormat( $fixedDocNumber ) ) {
-                $fixedDocNumber = str_replace( 'K', '0', $fixedDocNumber );
-                $fixedDocNumber = str_replace( 'L', '0', $fixedDocNumber );
-                $fixedDocNumber = str_replace( 'M', '0', $fixedDocNumber );
-                $position = substr( $fixedDocNumber, 0, 8 ) % 23;
-                $correctLetter = substr( $keyString, $position, 1 );
+
+        if ($this->isValidNIFFormat($fixedDocNumber)) {
+            $writtenLetter = substr($fixedDocNumber, -1);
+
+            if ($this->isValidNIFFormat($fixedDocNumber)) {
+                $fixedDocNumber = str_replace('K', '0', $fixedDocNumber);
+                $fixedDocNumber = str_replace('L', '0', $fixedDocNumber);
+                $fixedDocNumber = str_replace('M', '0', $fixedDocNumber);
+                $position = substr($fixedDocNumber, 0, 8) % 23;
+                $correctLetter = substr($keyString, $position, 1);
             }
         }
+
         return $correctLetter;
     }
+
     /*
      *   This function calculates the check digit for a corporate Spanish
      *   identification number (CIF).
@@ -328,7 +350,8 @@ class DocumentValidator
      *   Prints:
      *       6
      */
-    private function getCIFCheckDigit( $docNumber ) {
+    private function getCIFCheckDigit($docNumber)
+    {
         $fixedDocNumber = "";
         $centralChars = "";
         $firstChar = "";
@@ -337,34 +360,33 @@ class DocumentValidator
         $totalSum = 0;
         $lastDigitTotalSum = 0;
         $correctDigit = "";
-        $fixedDocNumber = strtoupper( $docNumber );
-        if( $this->isValidCIFFormat( $fixedDocNumber ) ) {
-            $firstChar = substr( $fixedDocNumber, 0, 1 );
-            $centralChars = substr( $fixedDocNumber, 1, 7 );
-            $evenSum =
-                substr( $centralChars, 1, 1 ) +
-                substr( $centralChars, 3, 1 ) +
-                substr( $centralChars, 5, 1 );
-            $oddSum =
-                $this->sumDigits( substr( $centralChars, 0, 1 ) * 2 ) +
-                $this->sumDigits( substr( $centralChars, 2, 1 ) * 2 ) +
-                $this->sumDigits( substr( $centralChars, 4, 1 ) * 2 ) +
-                $this->sumDigits( substr( $centralChars, 6, 1 ) * 2 );
+        $fixedDocNumber = strtoupper($docNumber);
+
+        if ($this->isValidCIFFormat($fixedDocNumber)) {
+            $firstChar = substr($fixedDocNumber, 0, 1);
+            $centralChars = substr($fixedDocNumber, 1, 7);
+            $evenSum = substr($centralChars, 1, 1) + substr($centralChars, 3, 1) + substr($centralChars, 5, 1);
+            $oddSum = $this->sumDigits(substr($centralChars, 0, 1) * 2) + $this->sumDigits(substr($centralChars, 2,
+                        1) * 2) + $this->sumDigits(substr($centralChars, 4,
+                        1) * 2) + $this->sumDigits(substr($centralChars, 6, 1) * 2);
             $totalSum = $evenSum + $oddSum;
-            $lastDigitTotalSum = substr( $totalSum, -1 );
-            if( $lastDigitTotalSum > 0 ) {
-                $correctDigit = 10 - ( $lastDigitTotalSum % 10 );
+            $lastDigitTotalSum = substr($totalSum, -1);
+
+            if ($lastDigitTotalSum > 0) {
+                $correctDigit = 10 - ($lastDigitTotalSum % 10);
             } else {
                 $correctDigit = 0;
             }
         }
         /* If CIF number starts with P, Q, S, N, W or R,
             check digit sould be a letter */
-        if( preg_match( '/[PQSNWR]/', $firstChar ) ) {
-            $correctDigit = substr( "JABCDEFGHI", $correctDigit, 1 );
+        if (preg_match('/[PQSNWR]/', $firstChar)) {
+            $correctDigit = substr("JABCDEFGHI", $correctDigit, 1);
         }
+
         return $correctDigit;
     }
+
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits a regexp pattern.
@@ -389,17 +411,22 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
-    private function respectsDocPattern( $givenString, $pattern ) {
-        $isValid = FALSE;
-        $fixedString = strtoupper( $givenString );
-        if( is_int( substr( $fixedString, 0, 1 ) ) ) {
-            $fixedString = substr( "000000000" . $givenString , -9 );
+    private function respectsDocPattern($givenString, $pattern)
+    {
+        $isValid = false;
+        $fixedString = strtoupper($givenString);
+
+        if (is_int(substr($fixedString, 0, 1))) {
+            $fixedString = substr("000000000" . $givenString, -9);
         }
-        if( preg_match( $pattern, $fixedString ) ) {
-            $isValid = TRUE;
+
+        if (preg_match($pattern, $fixedString)) {
+            $isValid = true;
         }
+
         return $isValid;
     }
+
     /*
      *   This function performs the sum, one by one, of the digits
      *   in a given quantity.
@@ -414,14 +441,17 @@ class DocumentValidator
      *   Returns:
      *       15
      */
-    private function sumDigits( $digits ) {
+    private function sumDigits($digits)
+    {
         $total = 0;
         $i = 1;
-        while( $i <= strlen( $digits ) ) {
-            $thisNumber = substr( $digits, $i - 1, 1 );
+
+        while ($i <= strlen($digits)) {
+            $thisNumber = substr($digits, $i - 1, 1);
             $total += $thisNumber;
             $i++;
         }
+
         return $total;
     }
 }
