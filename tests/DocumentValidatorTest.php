@@ -57,14 +57,30 @@ class DocumentValidatorTest extends TestCase
 
     /**
      * @test
+     * @dataProvider getValidCif
      */
-    public function itShouldValidateAValidCif()
+    public function itShouldValidateAValidCif($cif)
     {
         $validator = new DocumentValidator();
 
-        $result = $validator->isValidIdNumber('F43298256', 'cif');
+        $result = $validator->isValidIdNumber($cif, 'cif');
 
         $this->assertTrue($result);
+    }
+
+    public function getValidCif()
+    {
+        return [
+            ['B66044967'],
+            ['B23901762'],
+            ['Q0107868B'],
+            ['A29814019'],
+            ['A04828547'],
+            ['Q3456795H'],
+            ['B68466820'],
+            ['A58313859'],
+            ['S5750409D'],
+        ];
     }
 
     /**

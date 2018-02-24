@@ -29,6 +29,8 @@ class DocumentValidator
 
     const NIE_REGEX = '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/';
 
+    const CIF_REGEX = '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]|^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/';
+
     public function isValidIdNumber($docNumber, $type)
     {
         $fixedDocNumber = strtoupper($docNumber);
@@ -179,7 +181,7 @@ class DocumentValidator
         $fixedDocNumber = strtoupper($docNumber);
         $writtenDigit = substr($fixedDocNumber, -1, 1);
 
-        if ($this->isValidCIFFormat($fixedDocNumber)) {
+        if ($this->isValidCIFFormat($fixedDocNumber) == 1) {
             $correctDigit = $this->getCIFCheckDigit($fixedDocNumber);
 
             if ($writtenDigit == $correctDigit) {
@@ -269,9 +271,7 @@ class DocumentValidator
 
     private function isValidCIFFormat($docNumber)
     {
-        return $this->respectsDocPattern($docNumber,
-                '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/') or $this->respectsDocPattern($docNumber,
-                '/^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/');
+        return $this->respectsDocPattern($docNumber, self::CIF_REGEX);
     }
     /*
      *   This function calculates the check digit for an individual Spanish
