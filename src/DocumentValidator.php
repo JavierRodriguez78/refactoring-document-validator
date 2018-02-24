@@ -27,8 +27,6 @@ class DocumentValidator
     *   Returns:
     *       TRUE
     */
-    const NIF_REGEX = '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/';
-
     const NIE_REGEX = '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/';
 
     const CIF_REGEX = '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]|^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/';
@@ -40,7 +38,8 @@ class DocumentValidator
 
         switch ($fixedType) {
             case 'NIF':
-                return $this->isValidNIF($fixedDocNumber);
+                $validator = new NifValidator();
+                return $validator->isValid($fixedDocNumber);
             case 'NIE':
                 return $this->isValidNIE($fixedDocNumber);
             case 'CIF':
@@ -48,46 +47,6 @@ class DocumentValidator
             default:
                 throw new \Exception('Unsupported Type');
         }
-    }
-
-    /*
-     *   This function validates a Spanish identification number
-     *   verifying its check digits.
-     *
-     *   This function is intended to work with NIF numbers.
-     *
-     *   This function is used by:
-     *       - isValidIdNumber
-     *
-     *   This function requires:
-     *       - isValidCIFFormat
-     *       - getNIFCheckDigit
-     *
-     *   This function returns:
-     *       TRUE: If specified identification number is correct
-     *       FALSE: Otherwise
-     *
-     *   Algorithm works as described in:
-     *       http://www.interior.gob.es/dni-8/calculo-del-digito-de-Check-del-nif-nie-2217
-     *
-     *   Usage:
-     *       echo isValidNIF( '33576428Q' );
-     *   Returns:
-     *       TRUE
-     */
-    private function isValidNIF($docNumber)
-    {
-        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-        $writtenDigit = strtoupper(substr($docNumber, -1, 1));
-
-        if ($this->isValidNIFFormat($fixedDocNumber)) {
-            $correctDigit = $this->getNIFCheckDigit($fixedDocNumber);
-            if ($writtenDigit == $correctDigit) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /*
@@ -130,7 +89,9 @@ class DocumentValidator
                 the NIF altorithm */
             $fixedDocNumber = $this->prepareToNifValidation($fixedDocNumber);
 
-            return $this->isValidNIF($fixedDocNumber);
+            $nifValidator = new NifValidator();
+            
+            return $nifValidator->isValid($fixedDocNumber);
         }
 
         return false;
@@ -196,31 +157,6 @@ class DocumentValidator
 
     /*
      *   This function validates the format of a given string in order to
-     *   see if it fits with NIF format. Practically, it performs a validation
-     *   over a NIF, except this function does not check the check digit.
-     *
-     *   This function is intended to work with NIF numbers.
-     *
-     *   This function is used by:
-     *       - isValidIdNumber
-     *       - isValidNIF
-     *
-     *   This function returns:
-     *       TRUE: If specified string respects NIF format
-     *       FALSE: Otherwise
-     *
-     *   Usage:
-     *       echo isValidNIFFormat( '33576428Q' )
-     *   Returns:
-     *       TRUE
-     */
-
-    private function isValidNIFFormat($docNumber)
-    {
-        return $this->respectsDocPattern($docNumber, self::NIF_REGEX);
-    }
-    /*
-     *   This function validates the format of a given string in order to
      *   see if it fits with NIE format. Practically, it performs a validation
      *   over a NIE, except this function does not check the check digit.
      *
@@ -275,45 +211,7 @@ class DocumentValidator
     {
         return $this->respectsDocPattern($docNumber, self::CIF_REGEX);
     }
-    /*
-     *   This function calculates the check digit for an individual Spanish
-     *   identification number (NIF).
-     *
-     *   You can replace check digit with a zero when calling the function.
-     *
-     *   This function is used by:
-     *       - isValidNIF
-     *
-     *   This function requires:
-     *       - isValidNIFFormat
-     *
-     *   This function returns:
-     *       - Returns check digit if provided string had a correct NIF structure
-     *       - An empty string otherwise
-     *
-     *   Usage:
-     *       echo getNIFCheckDigit( '335764280' )
-     *   Returns:
-     *       Q
-     */
 
-    private function getNIFCheckDigit($docNumber)
-    {
-        $keyString = 'TRWAGMYFPDXBNJZSQVHLCKE';
-        $correctLetter = "";
-
-        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-
-        if ($this->isValidNIFFormat($fixedDocNumber)) {
-            $fixedDocNumber = str_replace('K', '0', $fixedDocNumber);
-            $fixedDocNumber = str_replace('L', '0', $fixedDocNumber);
-            $fixedDocNumber = str_replace('M', '0', $fixedDocNumber);
-            $position = substr($fixedDocNumber, 0, 8) % 23;
-            $correctLetter = substr($keyString, $position, 1);
-        }
-
-        return $correctLetter;
-    }
     /*
      *   This function calculates the check digit for a corporate Spanish
      *   identification number (CIF).
