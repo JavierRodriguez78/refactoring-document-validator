@@ -172,10 +172,6 @@ class DocumentValidator
 
     private function isValidCIF($docNumber)
     {
-        $isValid = false;
-        $fixedDocNumber = "";
-        $correctDigit = "";
-        $writtenDigit = "";
         $fixedDocNumber = strtoupper($docNumber);
         $writtenDigit = substr($fixedDocNumber, -1, 1);
 
@@ -183,12 +179,13 @@ class DocumentValidator
             $correctDigit = $this->getCIFCheckDigit($fixedDocNumber);
 
             if ($writtenDigit == $correctDigit) {
-                $isValid = true;
+                return true;
             }
         }
 
-        return $isValid;
+        return false;
     }
+
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with NIF format. Practically, it performs a validation
