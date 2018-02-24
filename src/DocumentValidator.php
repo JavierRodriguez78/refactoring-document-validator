@@ -175,7 +175,7 @@ class DocumentValidator
         $fixedDocNumber = strtoupper($docNumber);
         $writtenDigit = substr($fixedDocNumber, -1, 1);
 
-        if ($this->isValidCIFFormat($fixedDocNumber) == 1) {
+        if ($this->isValidCIFFormat($fixedDocNumber)) {
             $correctDigit = $this->getCIFCheckDigit($fixedDocNumber);
 
             if ($writtenDigit == $correctDigit) {
