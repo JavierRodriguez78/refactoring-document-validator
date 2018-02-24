@@ -109,35 +109,28 @@ class DocumentValidator
      */
     private function isValidNIE($docNumber)
     {
-        $isValid = false;
-        $fixedDocNumber = "";
-
-        if (!preg_match("/^[A-Z]+$/i", substr($fixedDocNumber, 1, 1))) {
-            $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-        } else {
-            $fixedDocNumber = strtoupper($docNumber);
-        }
+        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
 
         if ($this->isValidNIEFormat($fixedDocNumber)) {
 
             if (substr($fixedDocNumber, 1, 1) == "T") {
-                $isValid = true;
-            } else {
-                /* The algorithm for validating the check digits of a NIE number is
-                    identical to the altorithm for validating NIF numbers. We only have to
-                    replace Y, X and Z with 1, 0 and 2 respectively; and then, run
-                    the NIF altorithm */
-                $numberWithoutLast = substr($fixedDocNumber, 0, strlen($fixedDocNumber) - 1);
-                $lastDigit = substr($fixedDocNumber, strlen($fixedDocNumber) - 1, strlen($fixedDocNumber));
-                $numberWithoutLast = str_replace('Y', '1', $numberWithoutLast);
-                $numberWithoutLast = str_replace('X', '0', $numberWithoutLast);
-                $numberWithoutLast = str_replace('Z', '2', $numberWithoutLast);
-                $fixedDocNumber = $numberWithoutLast . $lastDigit;
-                $isValid = $this->isValidNIF($fixedDocNumber);
+                return true;
             }
+            /* The algorithm for validating the check digits of a NIE number is
+                identical to the altorithm for validating NIF numbers. We only have to
+                replace Y, X and Z with 1, 0 and 2 respectively; and then, run
+                the NIF altorithm */
+            $numberWithoutLast = substr($fixedDocNumber, 0, strlen($fixedDocNumber) - 1);
+            $lastDigit = substr($fixedDocNumber, strlen($fixedDocNumber) - 1, strlen($fixedDocNumber));
+            $numberWithoutLast = str_replace('Y', '1', $numberWithoutLast);
+            $numberWithoutLast = str_replace('X', '0', $numberWithoutLast);
+            $numberWithoutLast = str_replace('Z', '2', $numberWithoutLast);
+            $fixedDocNumber = $numberWithoutLast . $lastDigit;
+
+            return $this->isValidNIF($fixedDocNumber);
         }
 
-        return $isValid;
+        return false;
     }
 
     /*
