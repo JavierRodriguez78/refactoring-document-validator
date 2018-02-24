@@ -298,27 +298,16 @@ class DocumentValidator
     private function getNIFCheckDigit($docNumber)
     {
         $keyString = 'TRWAGMYFPDXBNJZSQVHLCKE';
-        $fixedDocNumber = "";
-        $position = 0;
-        $writtenLetter = "";
         $correctLetter = "";
 
-        if (!preg_match("/^[A-Z]+$/i", substr($fixedDocNumber, 1, 1))) {
-            $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
-        } else {
-            $fixedDocNumber = strtoupper($docNumber);
-        }
+        $fixedDocNumber = strtoupper(substr("000000000" . $docNumber, -9));
 
         if ($this->isValidNIFFormat($fixedDocNumber)) {
-            $writtenLetter = substr($fixedDocNumber, -1);
-
-            if ($this->isValidNIFFormat($fixedDocNumber)) {
-                $fixedDocNumber = str_replace('K', '0', $fixedDocNumber);
-                $fixedDocNumber = str_replace('L', '0', $fixedDocNumber);
-                $fixedDocNumber = str_replace('M', '0', $fixedDocNumber);
-                $position = substr($fixedDocNumber, 0, 8) % 23;
-                $correctLetter = substr($keyString, $position, 1);
-            }
+            $fixedDocNumber = str_replace('K', '0', $fixedDocNumber);
+            $fixedDocNumber = str_replace('L', '0', $fixedDocNumber);
+            $fixedDocNumber = str_replace('M', '0', $fixedDocNumber);
+            $position = substr($fixedDocNumber, 0, 8) % 23;
+            $correctLetter = substr($keyString, $position, 1);
         }
 
         return $correctLetter;

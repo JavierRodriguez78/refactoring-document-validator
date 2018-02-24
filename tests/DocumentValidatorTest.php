@@ -9,14 +9,31 @@ class DocumentValidatorTest extends TestCase
 {
     /**
      * @test
+     * @dataProvider  getValidNif
      */
-    public function itShouldValidateAValidNif()
+    public function itShouldValidateAValidNif($nif)
     {
         $validator = new DocumentValidator();
 
-        $result = $validator->isValidIdNumber('33576428Q', 'nif');
+        $result = $validator->isValidIdNumber($nif, 'nif');
 
         $this->assertTrue($result);
+    }
+
+    public function getValidNif()
+    {
+        return [
+            ['52129471V'],
+            ['56103805C'],
+            ['53834223D'],
+            ['62219093E'],
+            ['13927496F'],
+            ['47131798Z'],
+            ['85424889Z'],
+            ['61356650X'],
+            ['53753476S'],
+            ['28772951C'],
+        ];
     }
 
     /**
