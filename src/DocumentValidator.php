@@ -120,12 +120,7 @@ class DocumentValidator
                 identical to the altorithm for validating NIF numbers. We only have to
                 replace Y, X and Z with 1, 0 and 2 respectively; and then, run
                 the NIF altorithm */
-            $numberWithoutLast = substr($fixedDocNumber, 0, strlen($fixedDocNumber) - 1);
-            $lastDigit = substr($fixedDocNumber, strlen($fixedDocNumber) - 1, strlen($fixedDocNumber));
-            $numberWithoutLast = str_replace('Y', '1', $numberWithoutLast);
-            $numberWithoutLast = str_replace('X', '0', $numberWithoutLast);
-            $numberWithoutLast = str_replace('Z', '2', $numberWithoutLast);
-            $fixedDocNumber = $numberWithoutLast . $lastDigit;
+            $fixedDocNumber = $this->prepareToNifValidation($fixedDocNumber);
 
             return $this->isValidNIF($fixedDocNumber);
         }
@@ -133,6 +128,22 @@ class DocumentValidator
         return false;
     }
 
+    /**
+     * @param $fixedDocNumber
+     * @return string
+     */
+    private function prepareToNifValidation($fixedDocNumber)
+    {
+        $numberWithoutLast = substr($fixedDocNumber, 0, strlen($fixedDocNumber) - 1);
+        $lastDigit = substr($fixedDocNumber, strlen($fixedDocNumber) - 1, strlen($fixedDocNumber));
+        $numberWithoutLast = str_replace('Y', '1', $numberWithoutLast);
+        $numberWithoutLast = str_replace('X', '0', $numberWithoutLast);
+        $numberWithoutLast = str_replace('Z', '2', $numberWithoutLast);
+        $fixedDocNumber = $numberWithoutLast . $lastDigit;
+
+        return $fixedDocNumber;
+    }
+    
     /*
      *   This function validates a Spanish identification number
      *   verifying its check digits.
@@ -158,6 +169,7 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
+
     private function isValidCIF($docNumber)
     {
         $isValid = false;
@@ -177,7 +189,6 @@ class DocumentValidator
 
         return $isValid;
     }
-
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with NIF format. Practically, it performs a validation
@@ -198,11 +209,11 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
+
     private function isValidNIFFormat($docNumber)
     {
         return $this->respectsDocPattern($docNumber, '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/');
     }
-
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with NIE format. Practically, it performs a validation
@@ -226,11 +237,11 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
+
     private function isValidNIEFormat($docNumber)
     {
         return $this->respectsDocPattern($docNumber, '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/');
     }
-
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits with CIF format. Practically, it performs a validation
@@ -254,13 +265,13 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
+
     private function isValidCIFFormat($docNumber)
     {
         return $this->respectsDocPattern($docNumber,
                 '/^[PQSNWR][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/') or $this->respectsDocPattern($docNumber,
                 '/^[ABCDEFGHJUV][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/');
     }
-
     /*
      *   This function calculates the check digit for an individual Spanish
      *   identification number (NIF).
@@ -282,6 +293,7 @@ class DocumentValidator
      *   Returns:
      *       Q
      */
+
     private function getNIFCheckDigit($docNumber)
     {
         $keyString = 'TRWAGMYFPDXBNJZSQVHLCKE';
@@ -310,7 +322,6 @@ class DocumentValidator
 
         return $correctLetter;
     }
-
     /*
      *   This function calculates the check digit for a corporate Spanish
      *   identification number (CIF).
@@ -333,6 +344,7 @@ class DocumentValidator
      *   Prints:
      *       6
      */
+
     private function getCIFCheckDigit($docNumber)
     {
         $fixedDocNumber = "";
@@ -369,7 +381,6 @@ class DocumentValidator
 
         return $correctDigit;
     }
-
     /*
      *   This function validates the format of a given string in order to
      *   see if it fits a regexp pattern.
@@ -394,6 +405,7 @@ class DocumentValidator
      *   Returns:
      *       TRUE
      */
+
     private function respectsDocPattern($givenString, $pattern)
     {
         $isValid = false;
@@ -409,7 +421,6 @@ class DocumentValidator
 
         return $isValid;
     }
-
     /*
      *   This function performs the sum, one by one, of the digits
      *   in a given quantity.
@@ -424,6 +435,7 @@ class DocumentValidator
      *   Returns:
      *       15
      */
+
     private function sumDigits($digits)
     {
         $total = 0;
