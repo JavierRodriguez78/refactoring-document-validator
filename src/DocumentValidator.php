@@ -27,6 +27,8 @@ class DocumentValidator
     */
     const NIF_REGEX = '/^[KLM0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][a-zA-Z0-9]/';
 
+    const NIE_REGEX = '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/';
+
     public function isValidIdNumber($docNumber, $type)
     {
         $fixedDocNumber = strtoupper($docNumber);
@@ -239,7 +241,7 @@ class DocumentValidator
 
     private function isValidNIEFormat($docNumber)
     {
-        return $this->respectsDocPattern($docNumber, '/^[XYZT][0-9][0-9][0-9][0-9][0-9][0-9][0-9][A-Z0-9]/');
+        return $this->respectsDocPattern($docNumber, self::NIE_REGEX);
     }
     /*
      *   This function validates the format of a given string in order to
